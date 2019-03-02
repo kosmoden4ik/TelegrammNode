@@ -3,9 +3,11 @@ using System;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Threading.Tasks;
 using Telegram;
 using Telegram.Bot;
 using Telegram.Bot.Args;
+using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 
@@ -37,8 +39,47 @@ namespace ConsoleApp1
         private static async void getCallBack(object sender, CallbackQueryEventArgs e)
         {
             await botClient.AnswerCallbackQueryAsync(e.CallbackQuery.Id, $"You send to me\t\t {e.CallbackQuery.Message.Text}");
+            var gametalk = e.CallbackQuery.Message.Text;
+            if (gametalk == "/cartman")
+            {
+                await deleteLastMSG(e.CallbackQuery.Message.Chat, e.CallbackQuery.Message.MessageId);
+                await deleteLastMSG(e.CallbackQuery.Message.Chat, e.CallbackQuery.Message.MessageId);
+                await deleteLastMSG(e.CallbackQuery.Message.Chat, e.CallbackQuery.Message.MessageId);
+                botClient.SendPhotoAsync(e.CallbackQuery.Message.Chat.Id, "https://drive.google.com/open?id=1LtLBYSGehSZQRF5VLcR_wtCSd_Ev7oza");
+               botClient.SendTextMessageAsync(e.CallbackQuery.Message.Chat.Id, "Принцесса Кенни взбунтовалась");
+          
 
+            }
+            if (gametalk == "/chelvedsvin")
+            {
+                await deleteLastMSG(e.CallbackQuery.Message.Chat, e.CallbackQuery.Message.MessageId);
+                await deleteLastMSG(e.CallbackQuery.Message.Chat, e.CallbackQuery.Message.MessageId);
+                await deleteLastMSG(e.CallbackQuery.Message.Chat, e.CallbackQuery.Message.MessageId);
+                await botClient.SendPhotoAsync(e.CallbackQuery.Message.Chat.Id, "https://drive.google.com/open?id=17YDMvpDGYzGgNvZUf3cfFsLc0BJE1w0b");
+                await botClient.SendTextMessageAsync(e.CallbackQuery.Message.Chat.Id, "На Вас нападает ЧелВедСвин");
+            }
+            if (gametalk == "/kini")
+            {
+                await deleteLastMSG(e.CallbackQuery.Message.Chat, e.CallbackQuery.Message.MessageId);
+
+                await botClient.SendAnimationAsync(e.CallbackQuery.Message.Chat.Id, "https://cs.pikabu.ru/post_img/2013/11/22/12/1385149158_424870529.gif");
+            }
             //   await botClient.EditMessageReplyMarkupAsync(e.CallbackQuery.Message.Chat.Id, e.CallbackQuery.Message.MessageId, null);
+        }
+        private static async Task deleteLastMSG(Chat chatId, int msgId)
+        {
+            try
+            {
+                await botClient.DeleteMessageAsync(chatId, msgId);
+            }
+            catch (ApiRequestException e)
+            {
+                Console.WriteLine("Ne to(");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Delete");
+            }
         }
 
         private static void getMessage(object sender, MessageEventArgs e)
@@ -50,7 +91,9 @@ namespace ConsoleApp1
                         botClient.SendPhotoAsync(e.Message.Chat.Id, "https://drive.google.com/open?id=1uHdGP7xPEH3IM90e-wkN8m9kTEN6qFDZ");
                         botClient.SendTextMessageAsync(e.Message.Chat.Id, getUserInfo(e.Message));
                         botClient.SendTextMessageAsync(e.Message.Chat.Id, "Добро пожаловать в мир Дикого Севера");
-
+                        getCartmanSay(e.Message.Chat);
+                        getChelVedSvin(e.Message.Chat);
+                        getCennyAnime(e.Message.Chat);
                         break;
                     case "/weather":
                         var markupchik = new ReplyKeyboardMarkup(new[]{
@@ -92,8 +135,8 @@ namespace ConsoleApp1
                     case "/rivne":
                         botClient.SendTextMessageAsync(e.Message.Chat.Id, "Rivne");
                         break;
-                    case "/ternopol":
-                        botClient.SendTextMessageAsync(e.Message.Chat.Id, "Ternopil");
+                    case "/cartman":
+                        botClient.SendTextMessageAsync(e.Message.Chat.Id, "Принцесса Кенни взбунтовалась");
                         break;
                     case "/reply":
                         var markup = new ReplyKeyboardMarkup(new[]{
@@ -139,7 +182,30 @@ namespace ConsoleApp1
              * https://ru.piliapp.com/facebook-symbols/
              */
         }
-
+        private static async void getCartmanSay(Chat userChat)
+        {
+            InlineKeyboardButton z = new InlineKeyboardButton();
+            z.Text = "Поговорить с Картманом";
+            z.CallbackData = "/cartman";
+            var klava = new InlineKeyboardMarkup(z);
+            await botClient.SendTextMessageAsync(userChat.Id, "/cartman", replyMarkup:klava);
+        }
+        private static async void getChelVedSvin(Chat userChat)
+        {
+            InlineKeyboardButton z = new InlineKeyboardButton();
+            z.Text = "Пойти к ЧелВедСвину";
+            z.CallbackData = "/chelvedsvin";
+            var klava = new InlineKeyboardMarkup(z);
+            await botClient.SendTextMessageAsync(userChat.Id, "/chelvedsvin", replyMarkup: klava);
+        }
+        private static async void getCennyAnime(Chat userChat)
+        {
+            InlineKeyboardButton z = new InlineKeyboardButton();
+            z.Text = "Пойти к принцессе Кини";
+            z.CallbackData = "/kini";
+            var klava = new InlineKeyboardMarkup(z);
+            await botClient.SendTextMessageAsync(userChat.Id, "/kini", replyMarkup: klava);
+        }
         /// <summary>
         /// getting info about this user
         /// </summary>
@@ -164,6 +230,7 @@ namespace ConsoleApp1
 
             return sb.ToString();
         }
+   
         ///////////////////////////////////////////////////////////////////////////////////////////
       
         /////////////////////////////////////////////////////////////////////////////////////////
